@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "zipthis": {
+      "commandName": "Project",
+      "commandLineArgs": "HOW"
+    }
+  }
+}

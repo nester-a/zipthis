@@ -10,12 +10,49 @@ namespace zipthis
     {
         static void Main(string[] args)
         {
+            var needHelp = new string[]
+            {
+                "?",
+                "how",
+                "help"
+            };
+
+            if(args.Length > 0 && needHelp.Any(prompt => prompt.Equals(args[0], StringComparison.CurrentCultureIgnoreCase)))
+            {
+                ShowHelp();
+                return;
+            }
+
             var appArgs = new ZipThisArgs(args);
 
-            var files = new List<FileInfo>();
-            var sourceInfo = new DirectoryInfo(appArgs.Source);
+            if (appArgs.Source.Equals(Directory.GetCurrentDirectory()))
+            {
+                Console.WriteLine($"Cant zip 'zipthis' source directory!");
+                return;
+            }
 
-            FindAllFilesInDirectory(sourceInfo, files);
+            Console.WriteLine($"Start zipping {appArgs.Source} ...");
+
+            var files = new List<FileInfo>();
+
+            var sourceType = appArgs.Source.IsFileOrDirectory();
+
+            switch (sourceType)
+            {
+                case SourceType.File:
+                    var fileInfo = new FileInfo(appArgs.Source);
+                    files.Add(fileInfo);
+                    break;
+                case SourceType.Directory:
+                    var sourceDir = new DirectoryInfo(appArgs.Source);
+                    sourceDir.FindAllFiles(files);
+                    break;
+                default:
+                    Console.WriteLine("File or Directory on source path is not exists");
+                    return;
+            }
+
+            Console.WriteLine($"Files count: {files.Count}");
 
             var zipPath = Path.Combine(appArgs.Destination, appArgs.Name);
 
@@ -29,51 +66,25 @@ namespace zipthis
                     }
                 }
             }
+            Console.WriteLine($"Zipping finished. The archive is available at {appArgs.Destination}");
         }
 
-        static void FindAllFilesInDirectory(DirectoryInfo dir, List<FileInfo> filesNamesCol)
+        static void ShowHelp()
         {
-            var subDirs = dir.GetDirectories();
-            if (subDirs.Any())
+            var help = new string[]
             {
-                foreach (var subDir in subDirs)
-                {
-                    FindAllFilesInDirectory(subDir, filesNamesCol);
-                }
-            }
-            var files = dir.GetFiles();
-            foreach (var file in files)
-            {
-                filesNamesCol.Add(file);
-            }
-        }
-    }
-    class ZipThisArgs
-    {
-        private const string _ext = ".zip";
+                "HOW TO USE 'ZIPTHIS':",
+                @"?> zipthis {zip archive name} {zip archive source} {zip archive destination}",
+                "WHERE:",
+                "{zip archive name} - is final archive name. Default value is source directory name;",
+                "{zip archive source} - is the source directory to be archived. Default value is 'zipthis' execution directory;",
+                "{zip archive destination} - is directory where the archive will be created. Default value is 'zipthis' execution directory.",
+            };
 
-        public ZipThisArgs(string[] args)
-        {
-            if(args.Length > 0)
+            foreach (var item in help)
             {
-                Name = args[0].EndsWith(_ext) ? args[0] : args[0] + _ext;
-            }
-
-            if(args.Length > 1)
-            {
-                Source = args[1];
-            }
-
-            if (args.Length > 2)
-            {
-                Destination = Path.Combine(args[2], Name);
+                Console.WriteLine(item);
             }
         }
-
-        public string Name { get; set; } = new DirectoryInfo(Environment.CurrentDirectory).Name + _ext;
-
-        //TODO: delete test path
-        public string Source { get; set; } = Path.Combine(Environment.CurrentDirectory, "test");
-        public string Destination { get; set; } = Path.Combine(Environment.CurrentDirectory);
     }
 }
