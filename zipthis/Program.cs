@@ -25,7 +25,7 @@ namespace zipthis
 
             var appArgs = new ZipThisArgs(args);
 
-            if (appArgs.Source.Equals(Directory.GetCurrentDirectory()))
+            if (appArgs.Source.Equals(AppDomain.CurrentDomain.BaseDirectory))
             {
                 Console.WriteLine($"Cant zip 'zipthis' source directory!");
                 return;
