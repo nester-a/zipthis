@@ -12,6 +12,11 @@
 	<RepositoryUrl>https://github.com/nester-a/zipthis</RepositoryUrl>
 	<PackageTags>zip</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+	<ItemGroup>
+        <None Include="..\README.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
 </Project>
